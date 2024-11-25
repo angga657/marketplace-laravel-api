@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Builder;
 
 class ProductController extends Controller
 {
@@ -13,36 +14,50 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         //
-        // $perPage = $request->query('per_page', 5); // Default per halaman 5
+        // Get the search keyword from the request
+        $keyword = $request->input('keyword');
 
-        $keyword = $request->query('keyword', '');
+        // Start the query for products
+        $query = Product::with(['brand', 'category']);
 
-        $products = Product::with(['brand', 'category'])
-            ->where('name', 'like', "%{$keyword}%")
-            ->orWhereHas('brand', function ($query) use ($keyword) {
-                $query->where('brand_name', 'like', "%{$keyword}%");
-            })
-            ->orWhereHas('category', function ($query) use ($keyword) {
-                $query->where('category_name', 'like', "%{$keyword}%");
-            })
+        // If a keyword is provided, apply the search conditions
+        if ($keyword) {
+            // return $keyword;
+            $query->where('name', 'like', "%{$keyword}%")
             ->orWhere('price', 'like', "%{$keyword}%")
             ->orWhere('stock', 'like', "%{$keyword}%")
-            ->orderBy('category_id', 'asc')
+            ->orWhereHas('category', function (Builder $q) use ($keyword) {
+                $q->where('category_name', 'like', "%{$keyword}%");
+            });
+        }
+
+        // Paginate the results
+        $products = $query->with('category')
+            ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
+            ->orderBy('categories.category_name', 'asc')
+            ->select('products.*')
             ->paginate(10);
 
-        $products->getCollection()->transform(function ($product) {
+        // Format the results
+        $formattedProducts = $products->map(function ($product) {
             return [
                 'id' => $product->id,
                 'name' => $product->name,
-                'brand_name' => $product->brand->brand_name,
-                'category_name' => $product->category->category_name,
+                'brand' => $product->brand ? $product->brand->brand_name : null, // Display brand name, null if not found
+                'category' => $product->category ? $product->category->category_name : null, // Display category name, null if not found
                 'price' => $product->price,
-                'stock' => $product->stock,
+                'stock' => $product->stock
             ];
         });
 
-        // return response()->json(['products' => $products]);
-        return response()->json($products);
+        // Return the paginated products as JSON
+        return response()->json([
+            'data' => $formattedProducts,
+            'current_page' => $products->currentPage(),
+            'last_page' => $products->lastPage(),
+            'per_page' => $products->perPage(),
+            'total' => $products->total(),
+        ]);
     }
 
     /**
