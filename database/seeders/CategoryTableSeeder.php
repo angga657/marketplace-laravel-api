@@ -18,22 +18,32 @@ class CategoryTableSeeder extends Seeder
         $now = now();
         DB::table('categories')->insert([
             'category_name' => 'Laptop',
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
 
         DB::table('categories')->insert([
             'category_name' => 'Gaming Laptop',
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
 
         DB::table('categories')->insert([
             'category_name' => 'PC',
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
 
         DB::table('categories')->insert([
             'category_name' => 'Keyboard',
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
 
         DB::table('categories')->insert([
             'category_name' => 'Gaming Keyboard',
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
     }
 }

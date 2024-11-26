@@ -18,22 +18,32 @@ class BrandTableSeeder extends Seeder
         $now = now();
         DB::table('brands')->insert([
             'brand_name' => 'Acer',
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
 
         DB::table('brands')->insert([
             'brand_name' => 'Asus',
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
 
         DB::table('brands')->insert([
             'brand_name' => 'Lenovo',
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
 
         DB::table('brands')->insert([
             'brand_name' => 'Axio',
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
 
         DB::table('brands')->insert([
             'brand_name' => 'HP',
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
 
         
