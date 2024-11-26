@@ -92,14 +92,29 @@ class ProductController extends Controller
     public function show($id)
     {
         //
-        $products = Product::findOrFail($id);
-        return response()->json($products);
+        // $products = Product::findOrFail($id);
+        // return response()->json($products);
 
         // if ($products) {
         //     return response()->json(['product' => $products]);
         // } else {
         //     return response()->json(['message' => 'Produk tidak ditemukan'], 404);
         // }
+
+        $products = Product::with(['brand','category'])->findOrFail($id);
+
+        if(!$products) {
+            return response()->json(['message'=>'Product not Found'], 404);
+        }
+
+        return response()->json([
+            'id' => $products->id,
+            'name' => $products->name,
+            'brand' => $products->brand ? $products->brand->brand_name : null,
+            'category' => $products->category ? $products->category->category_name : null,
+            'price' => $products->price,
+            'stock' => $products->stock,
+        ]);
     }
 
     /**
